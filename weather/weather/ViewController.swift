@@ -39,7 +39,8 @@ class ViewController: UIViewController {
     @IBAction private func onGetWeatherButton(_ sender: Any) {
         if let inputText = textField.text {
             if !inputText.isEmpty {
-                city = inputText
+                let cityNameForRequest = inputText.split(separator: " ").joined(separator: "%20")
+                city = cityNameForRequest
             }
         }
         getCityWeather()
