@@ -1,0 +1,252 @@
+# By default, SwiftLint uses a set of sensible default rules you can adjust:
+disabled_rules: # rule identifiers turned on by default to exclude from running
+  - attributes
+  - explicit_self
+  - explicit_type_interface
+  - explicit_top_level_acl
+  - explicit_acl
+  - implicit_return
+  - inclusive_language
+  - missing_docs
+  - multiline_arguments_brackets
+  - multiline_literal_brackets
+  - multiline_parameters_brackets
+  - nslocalizedstring_require_bundle
+  - object_literal
+  - prefer_nimble
+  - prohibited_interface_builder
+  - required_deinit
+  - strong_iboutlet
+  - vertical_whitespace_between_cases
+  - discouraged_optional_collection
+  - no_grouping_extension
+  - private_outlet
+  - implicitly_unwrapped_optional
+  - multiple_closures_with_trailing_closure #default
+
+opt_in_rules: # some rules are turned off by default, so you need to opt-in
+  - anyobject_protocol
+  - array_init
+  - block_based_kvo #default
+  - class_delegate_protocol #default
+  - closing_brace #default
+  - closure_body_length
+  - closure_end_indentation
+  - closure_parameter_position #default
+  - closure_spacing
+  - collection_alignment
+  - colon #default
+  - comma #default
+  - comment_spacing #default
+  - compiler_protocol_init #default
+  - computed_accessors_order #default
+  - conditional_returns_on_newline
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - contains_over_range_nil_comparison
+  - control_statement #default
+  - convenience_type
+  - cyclomatic_complexity #default
+  - deployment_target #default
+  - discarded_notification_center_observer #default
+  - discouraged_direct_init #default
+  - discouraged_object_literal
+  - discouraged_optional_boolean
+  - duplicate_enum_cases #default
+  - duplicate_imports #default
+  - dynamic_inline #default
+  - empty_collection_literal
+  - empty_count
+  - empty_enum_arguments #default
+  - empty_parameters #default
+  - empty_parentheses_with_trailing_closure #default
+  - empty_string
+  - empty_xctest_method
+  - enum_case_associated_values_count
+  - expiring_todo
+  - explicit_enum_raw_value
+  - explicit_init
+  - extension_access_modifier
+  - fallthrough
+  - fatal_error_message
+  - file_header
+  - file_length #default
+  - file_name
+  - file_name_no_space
+  - file_types_order
+  - first_where
+  - flatmap_over_map_reduce
+  - for_where #default
+  - force_cast #default
+  - force_try #default
+  - force_unwrapping
+  - function_body_length #default
+  - function_default_parameter_at_end
+  - function_parameter_count #default
+  - generic_type_name #default
+  - ibinspectable_in_extension
+  - identical_operands
+  - identifier_name #default
+  - implicit_getter #default
+  - indentation_width
+  - inert_defer #default
+  - is_disjoint #default
+  - joined_default_parameter
+  - large_tuple #default
+  - last_where
+  - leading_whitespace #default
+  - legacy_cggeometry_functions #default
+  - legacy_constant #default
+  - legacy_constructor #default
+  - legacy_hashing #default
+  - legacy_multiple 
+  - legacy_nsgeometry_functions #default
+  - legacy_random
+  - let_var_whitespace
+  - line_length #default
+  - literal_expression_end_indentation
+  - lower_acl_than_parent
+  - mark #default
+  - modifier_order
+  - multiline_arguments 
+  - multiline_function_chains
+  - multiline_parameters
+  - nesting #default
+  - nimble_operator
+  - no_extension_access_modifier
+  - no_fallthrough_only #default
+  - no_space_in_method_call #default
+#  - non_private_xctest_member
+  - notification_center_detachment #default
+  - nslocalizedstring_key
+  - nsobject_prefer_isequal #default
+  - number_separator
+  - opening_brace #default
+  - operator_usage_whitespace
+  - operator_whitespace #default
+  - optional_enum_case_matching
+  - orphaned_doc_comment #default
+  - overridden_super_call
+  - override_in_extension
+  - pattern_matching_keywords
+  - prefer_self_type_over_type_of_self
+  - prefer_zero_over_explicit_init
+  - prefixed_toplevel_constant
+  - private_action
+  - private_over_fileprivate #default
+  - private_unit_test #default
+  - prohibited_super_call
+  - protocol_property_accessors_order #default
+  - quick_discouraged_call
+  - quick_discouraged_focused_test
+  - quick_discouraged_pending_test
+  - raw_value_for_camel_cased_codable_enum
+  - reduce_boolean #default
+  - reduce_into
+  - redundant_discardable_let #default
+  - redundant_nil_coalescing
+  - redundant_objc_attribute #default
+  - redundant_optional_initialization #default
+  - redundant_set_access_control #default
+  - redundant_string_enum_value #default
+  - redundant_type_annotation
+  - redundant_void_return #default
+  - required_enum_case
+  - return_arrow_whitespace #default
+  - shorthand_operator #default
+  - single_test_class
+  - sorted_first_last
+  - sorted_imports
+  - statement_position #default
+  - static_operator
+  - strict_fileprivate
+  - superfluous_disable_command #default
+  - switch_case_alignment #default
+  - switch_case_on_newline
+  - syntactic_sugar #default
+  - test_case_accessibility 
+  - todo #default
+  - toggle_bool
+  - trailing_closure
+  - trailing_comma #default
+  - trailing_newline #default
+  - trailing_semicolon #default
+  - trailing_whitespace #default
+  - type_body_length #default
+  - type_contents_order
+  - type_name #default
+  - unavailable_function
+  - unneeded_break_in_switch #default
+  - unneeded_parentheses_in_closure_argument
+  - unowned_variable_capture
+  - untyped_error_in_catch
+  - unused_capture_list #default
+  - unused_closure_parameter #default
+  - unused_control_flow_label #default
+  - unused_declaration
+  - unused_enumerated #default
+  - unused_import 
+  - unused_optional_binding #default
+  - unused_setter_value #default
+  - valid_ibinspectable #default
+  - vertical_parameter_alignment #default
+  - vertical_parameter_alignment_on_call
+  - vertical_whitespace #default
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces
+  - void_return #default
+  - weak_delegate #default
+  - xct_specific_matcher
+  - xctfail_message #default
+  - yoda_condition
+
+# Alternatively, specify all rules explicitly by uncommenting this option:
+# only_rules: # delete `disabled_rules` & `opt_in_rules` if using this
+#   - empty_parameters
+#   - vertical_whitespace
+
+excluded: # paths to ignore during linting. Takes precedence over `included`.
+  - Carthage
+  - Pods
+
+
+# configurable rules can be customized from this configuration file
+# binary rules can set their severity level
+force_cast: warning # implicitly
+force_try:
+  severity: warning # explicitly
+# rules that have both warning and error levels, can set just the warning level
+# implicitly
+line_length: 180
+# they can set both implicitly with an array
+type_body_length:
+  - 300 # warning
+  - 400 # error
+# or they can set both explicitly
+file_length:
+  warning: 500
+  error: 1200
+# naming rules can set warnings/errors for min_length and max_length
+# additionally they can set excluded names
+type_name:
+  min_length: 3 # only warning
+  max_length: # warning and error
+    warning: 40
+    error: 50
+  excluded: iPhone # excluded via string
+  allowed_symbols: ["_"] # these are allowed in type names
+identifier_name:
+  min_length: 2 # only min_length
+  max_length:
+    error: 40 # only error
+  excluded: # excluded via string array
+    - x
+    - y
+    - i
+    - dx
+    - dy
+    - id
+    - URL
+    - GlobalAPIKey
+reporter: "xcode" # reporter type (xcode, json, csv, checkstyle, codeclimate, junit, html, emoji, sonarqube, markdown, github-actions-logging)
