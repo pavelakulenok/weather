@@ -29,6 +29,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
         if let lastCityNameEntered = UserDefaults.standard.string(forKey: "city") {
             city = lastCityNameEntered
         }
@@ -101,8 +103,6 @@ class ViewController: UIViewController {
             do {
                 self.forecastCityWeather = try JSONDecoder().decode(WeatherData.self, from: data)
                 DispatchQueue.main.async {
-                    self.tableView.delegate = self
-                    self.tableView.dataSource = self
                     self.tableView.reloadData()
                 }
             } catch {
