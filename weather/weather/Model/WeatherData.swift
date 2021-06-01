@@ -7,10 +7,6 @@
 
 import Foundation
 
-struct City: Codable {
-    let name: String
-}
-
 struct Weather: Codable {
     let description: String
     let icon: String
@@ -50,5 +46,4 @@ struct ListWeatherData: Codable {
 
 struct WeatherData: Codable {
     let list: [ListWeatherData]
-    let city: City
 }
