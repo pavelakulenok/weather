@@ -8,7 +8,12 @@
 import UIKit
 
 class ViewController: UIViewController {
-    private var city = "Minsk"
+    enum TypeOfRequest {
+        case currentWeather(city: String)
+        case forecastWeather(city: String)
+    }
+
+    private var city: String?
     private var currentCityWeather: ListWeatherData?
     private var forecastCityWeather: WeatherData?
     @IBOutlet weak var textField: UITextField!
@@ -35,7 +40,10 @@ class ViewController: UIViewController {
             city = lastCityNameEntered
         }
         tableView.register(UINib(nibName: "ForecastWeatherTableViewCell", bundle: Bundle.main), forCellReuseIdentifier: "cell")
-        getCityWeather()
+        if let cityName = city {
+            getWeather(typeOfRequest: .currentWeather(city: cityName))
+            getWeather(typeOfRequest: .forecastWeather(city: cityName))
+        }
     }
 
     @IBAction private func onGetWeatherButton(_ sender: Any) {
@@ -45,7 +53,10 @@ class ViewController: UIViewController {
                 city = cityNameForRequest
             }
         }
-        getCityWeather()
+        if let cityName = city {
+            getWeather(typeOfRequest: .currentWeather(city: cityName))
+            getWeather(typeOfRequest: .forecastWeather(city: cityName))
+        }
     }
 
     private func setupUI() {
@@ -66,26 +77,37 @@ class ViewController: UIViewController {
         tableView.stetupUIView(borderWidth: 2, cornerRadius: 10)
     }
 
-    private func getCityWeather() {
-        guard let urlCurrentWeather = URL(string: "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=9276e12f77d3514a750b09c32403379e") else {
-            return
+    private func getWeather(typeOfRequest: TypeOfRequest) {
+        var urlString = ""
+        switch typeOfRequest {
+        case let .currentWeather(city):
+            urlString = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=9276e12f77d3514a750b09c32403379e"
+        case let .forecastWeather(city):
+            urlString = "https://api.openweathermap.org/data/2.5/forecast?q=\(city)&appid=9276e12f77d3514a750b09c32403379e"
         }
-        guard let urlForecastWeather = URL(string: "https://api.openweathermap.org/data/2.5/forecast?q=\(city)&appid=9276e12f77d3514a750b09c32403379e") else {
-            return
-        }
-        let requestCurrentWeather = URLRequest(url: urlCurrentWeather)
-        let requestForecastWeather = URLRequest(url: urlForecastWeather)
 
-        let dataTaskCurrentWeather = URLSession.shared.dataTask(with: requestCurrentWeather) { data, _, _ in
+        guard let url = URL(string: urlString) else {
+            return
+        }
+        let requestWeather = URLRequest(url: url)
+        let dataTaskCurrentWeather = URLSession.shared.dataTask(with: requestWeather) { data, _, _ in
             guard let data = data else {
-                assertionFailure("Can't get data from \(urlCurrentWeather)")
+                assertionFailure("Can't get data from \(urlString)")
                 return
             }
             do {
-                self.currentCityWeather = try JSONDecoder().decode(ListWeatherData.self, from: data)
-                UserDefaults.standard.setValue(self.city, forKey: "city")
-                DispatchQueue.main.async {
-                    self.showCurrentCityWeather()
+                switch typeOfRequest {
+                case .currentWeather:
+                    self.currentCityWeather = try JSONDecoder().decode(ListWeatherData.self, from: data)
+                    UserDefaults.standard.setValue(self.city, forKey: "city")
+                    DispatchQueue.main.async {
+                        self.showCurrentCityWeather()
+                    }
+                case .forecastWeather:
+                    self.forecastCityWeather = try JSONDecoder().decode(WeatherData.self, from: data)
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -94,24 +116,6 @@ class ViewController: UIViewController {
             }
         }
         dataTaskCurrentWeather.resume()
-
-        let dataTaskForecastWeather = URLSession.shared.dataTask(with: requestForecastWeather) { data, _, _ in
-            guard let data = data else {
-                assertionFailure("Can't get data from \(urlForecastWeather)")
-                return
-            }
-            do {
-                self.forecastCityWeather = try JSONDecoder().decode(WeatherData.self, from: data)
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self.showAlertWithOneButton(title: "Can't find this city", message: "please, check the city name", actionTitle: "Ok", actionStyle: .default, handler: nil)
-                }
-            }
-        }
-        dataTaskForecastWeather.resume()
     }
 
     private func showCurrentCityWeather() {
