@@ -5,17 +5,25 @@
 //  Created by Pavel Akulenak on 24.05.21.
 //
 
+import CoreLocation
 import UIKit
 
 class ViewController: UIViewController {
+    enum DataSourceForRequest {
+        case cityName(city: String)
+        case coordinate(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
+    }
     enum TypeOfRequest {
-        case currentWeather(city: String)
-        case forecastWeather(city: String)
+        case currentWeather
+        case forecastWeather
     }
 
     private var city: String?
     private var currentCityWeather: ListWeatherData?
     private var forecastCityWeather: WeatherData?
+    private var latitude: CLLocationDegrees?
+    private var longitude: CLLocationDegrees?
+    private lazy var locationManager = CLLocationManager()
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var cityNameLabel: UILabel!
@@ -30,19 +38,27 @@ class ViewController: UIViewController {
     @IBOutlet weak var humidityLabel: UILabel!
     @IBOutlet weak var windLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var locationButton: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        if let lastCityNameEntered = UserDefaults.standard.string(forKey: "city") {
-            city = lastCityNameEntered
-        }
         tableView.register(UINib(nibName: "ForecastWeatherTableViewCell", bundle: Bundle.main), forCellReuseIdentifier: "cell")
-        if let cityName = city {
-            getWeather(typeOfRequest: .currentWeather(city: cityName))
-            getWeather(typeOfRequest: .forecastWeather(city: cityName))
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
+
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.requestLocation()
+        } else if let lastLongitude = UserDefaults.standard.value(forKey: "longitude"), let lastLatitude = UserDefaults.standard.value(forKey: "latitude") {
+            longitude = lastLongitude as? CLLocationDegrees
+            latitude = lastLatitude as? CLLocationDegrees
+            getWeatherForLocation()
+        } else if let lastCityNameEntered = UserDefaults.standard.string(forKey: "city") {
+            city = lastCityNameEntered
+            getWeatherForCityName()
         }
     }
 
@@ -53,10 +69,11 @@ class ViewController: UIViewController {
                 city = cityNameForRequest
             }
         }
-        if let cityName = city {
-            getWeather(typeOfRequest: .currentWeather(city: cityName))
-            getWeather(typeOfRequest: .forecastWeather(city: cityName))
-        }
+        getWeatherForCityName()
+    }
+
+    @IBAction private func onLocationButton(_ sender: Any) {
+        locationManager.requestLocation()
     }
 
     private func setupUI() {
@@ -75,17 +92,25 @@ class ViewController: UIViewController {
         humidityLabel.setupLabel(fontName: "HelveticaNeue-Medium", fontSize: 20, fontColor: .lightGray)
         windLabel.setupLabel(fontName: "HelveticaNeue-Medium", fontSize: 20, fontColor: .lightGray)
         tableView.stetupUIView(borderWidth: 2, cornerRadius: 10)
+        locationButton.setImage(UIImage(named: "location"), for: .normal)
+        locationButton.tintColor = .darkGray
     }
 
-    private func getWeather(typeOfRequest: TypeOfRequest) {
+    private func getWeather(dataSourseForRequest: DataSourceForRequest, typeOfRequest: TypeOfRequest) {
         var urlString = ""
+        var type = ""
         switch typeOfRequest {
-        case let .currentWeather(city):
-            urlString = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=9276e12f77d3514a750b09c32403379e"
-        case let .forecastWeather(city):
-            urlString = "https://api.openweathermap.org/data/2.5/forecast?q=\(city)&appid=9276e12f77d3514a750b09c32403379e"
+        case .currentWeather:
+            type = "weather"
+        case .forecastWeather:
+            type = "forecast"
         }
-
+        switch dataSourseForRequest {
+        case let .cityName(city):
+            urlString = "https://api.openweathermap.org/data/2.5/\(type)?q=\(city)&appid=9276e12f77d3514a750b09c32403379e"
+        case let .coordinate(latitude, longitude):
+            urlString = "https://api.openweathermap.org/data/2.5/\(type)?lat=\(latitude)&lon=\(longitude)&appid=9276e12f77d3514a750b09c32403379e"
+        }
         guard let url = URL(string: urlString) else {
             return
         }
@@ -116,6 +141,20 @@ class ViewController: UIViewController {
             }
         }
         dataTaskCurrentWeather.resume()
+    }
+
+    private func getWeatherForLocation() {
+        if let longitude = longitude, let latitude = latitude {
+            getWeather(dataSourseForRequest: .coordinate(latitude: latitude, longitude: longitude), typeOfRequest: .currentWeather)
+            getWeather(dataSourseForRequest: .coordinate(latitude: latitude, longitude: longitude), typeOfRequest: .forecastWeather)
+        }
+    }
+
+    private func getWeatherForCityName() {
+        if let cityName = city {
+            getWeather(dataSourseForRequest: .cityName(city: cityName), typeOfRequest: .currentWeather)
+            getWeather(dataSourseForRequest: .cityName(city: cityName), typeOfRequest: .forecastWeather)
+        }
     }
 
     private func showCurrentCityWeather() {
@@ -206,5 +245,19 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         }
         cell.stetupUIView(borderWidth: 1, cornerRadius: 0)
         return cell
+    }
+}
+
+extension ViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        latitude = locations.last?.coordinate.latitude
+        longitude = locations.last?.coordinate.longitude
+        UserDefaults.standard.setValue(latitude, forKey: "latitude")
+        UserDefaults.standard.setValue(longitude, forKey: "longitude")
+        getWeatherForLocation()
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        assertionFailure("\(error)")
     }
 }
