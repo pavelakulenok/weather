@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     private var latitude: CLLocationDegrees?
     private var longitude: CLLocationDegrees?
     private var locationManager = CLLocationManager()
+
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var cityNameLabel: UILabel!
@@ -136,7 +137,9 @@ class ViewController: UIViewController {
         temperatureLabel.text = "\((info.main.temperature - 273.15).rounded(toPlaces: 1))℃"
         weatherDiscriptionLabel.text = info.weather.first?.description
         feelsLikeLabel.text = "feels like: \(Int((info.main.feelsLike - 273.15).rounded()))℃"
-        windLabel.text = "wind: \((info.wind.speed).rounded(toPlaces: 1)) m/s, \(getWindDirection(deg: info.wind.deg)), gust: \((info.wind.gust).rounded(toPlaces: 1)) m/s"
+        if let windDirection = info.wind.direction {
+            windLabel.text = "wind: \((info.wind.speed).rounded(toPlaces: 1)) m/s, \(windDirection), gust: \((info.wind.gust).rounded(toPlaces: 1)) m/s"
+        }
         minTemperatureLabel.text = "min: \((info.main.temperatureMin - 273.15).rounded(toPlaces: 1))℃"
         maxTemperatureLabel.text = "max: \((info.main.temperatureMax - 273.15).rounded(toPlaces: 1))℃"
         pressureLabel.text = "pressure: \((info.main.pressure)) hPa"
@@ -157,29 +160,6 @@ class ViewController: UIViewController {
             return UIImage()
         }
         return image
-    }
-
-    private func getWindDirection(deg: Int) -> String {
-        let doubleDeg = Double(deg)
-        var direction = ""
-        if doubleDeg > 337.5 || doubleDeg <= 22.5 {
-            direction = "N"
-        } else if doubleDeg > 22.5 && doubleDeg <= 67.5 {
-            direction = "NE"
-        } else if doubleDeg > 67.5 && doubleDeg <= 112.5 {
-            direction = "E"
-        } else if doubleDeg > 112.5 && doubleDeg <= 157.5 {
-            direction = "SE"
-        } else if doubleDeg > 157.5 && doubleDeg <= 202.5 {
-            direction = "S"
-        } else if doubleDeg > 202.5 && doubleDeg <= 247.5 {
-            direction = "SW"
-        } else if doubleDeg > 247.5 && doubleDeg <= 292.5 {
-            direction = "W"
-        } else if doubleDeg > 292.5 && doubleDeg <= 337.5 {
-            direction = "NW"
-        }
-        return direction
     }
 }
 
