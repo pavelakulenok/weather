@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D413BE77266EB11F001AAAEE /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D413BE76266EB11F001AAAEE /* Manager.swift */; };
 		D4288DEC265ED8A100943C73 /* UITextField+UIUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4288DEB265ED8A100943C73 /* UITextField+UIUtilities.swift */; };
 		D4288DEE265ED9A300943C73 /* UIButton+UIUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4288DED265ED9A300943C73 /* UIButton+UIUtilities.swift */; };
 		D4288DF3265F973200943C73 /* WeatherData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4288DF2265F973200943C73 /* WeatherData.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D413BE76266EB11F001AAAEE /* Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Manager.swift; sourceTree = "<group>"; };
 		D4288DEB265ED8A100943C73 /* UITextField+UIUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+UIUtilities.swift"; sourceTree = "<group>"; };
 		D4288DED265ED9A300943C73 /* UIButton+UIUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+UIUtilities.swift"; sourceTree = "<group>"; };
 		D4288DF2265F973200943C73 /* WeatherData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherData.swift; sourceTree = "<group>"; };
@@ -55,14 +57,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D4288DF8265FB33C00943C73 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				D4288DF2265F973200943C73 /* WeatherData.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		D4288DFA265FB35B00943C73 /* TableViewCell */ = {
 			isa = PBXGroup;
 			children = (
@@ -83,14 +77,6 @@
 				D479BBCD265D3EF7000CE408 /* Double+round.swift */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		D49F28232660396A002DBF41 /* ViewControllers */ = {
-			isa = PBXGroup;
-			children = (
-				D4F5B08E265BEE79004B528D /* ViewController.swift */,
-			);
-			path = ViewControllers;
 			sourceTree = "<group>";
 		};
 		D49F28242660397A002DBF41 /* Storyboards */ = {
@@ -124,11 +110,12 @@
 				D4F5B08A265BEE79004B528D /* AppDelegate.swift */,
 				D4F5B08C265BEE79004B528D /* SceneDelegate.swift */,
 				D4F5B093265BEE7A004B528D /* Assets.xcassets */,
+				D4F5B08E265BEE79004B528D /* ViewController.swift */,
+				D4288DF2265F973200943C73 /* WeatherData.swift */,
+				D413BE76266EB11F001AAAEE /* Manager.swift */,
 				D4F5B098265BEE7A004B528D /* Info.plist */,
 				D49F28242660397A002DBF41 /* Storyboards */,
-				D49F28232660396A002DBF41 /* ViewControllers */,
 				D4288DFA265FB35B00943C73 /* TableViewCell */,
-				D4288DF8265FB33C00943C73 /* Model */,
 				D479BBCC265D3EBF000CE408 /* Extensions */,
 			);
 			path = weather;
@@ -233,6 +220,7 @@
 				D4F5B08F265BEE79004B528D /* ViewController.swift in Sources */,
 				D44DDE75265E9E4B005B46B4 /* UIView+border+radius.swift in Sources */,
 				D4F5B08B265BEE79004B528D /* AppDelegate.swift in Sources */,
+				D413BE77266EB11F001AAAEE /* Manager.swift in Sources */,
 				D4288DF3265F973200943C73 /* WeatherData.swift in Sources */,
 				D4F5B08D265BEE79004B528D /* SceneDelegate.swift in Sources */,
 				D4288DEE265ED9A300943C73 /* UIButton+UIUtilities.swift in Sources */,
