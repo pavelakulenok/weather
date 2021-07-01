@@ -8,7 +8,7 @@
 import CoreLocation
 import UIKit
 
-class ViewController: UIViewController {
+class WeatherViewController: UIViewController {
     private var city: String?
     private var currentCityWeather: ListWeatherData?
     private var forecastCityWeather: WeatherData?
@@ -90,7 +90,7 @@ class ViewController: UIViewController {
         switch dataSourse {
         case .cityName:
             if let cityName = city {
-                Manager.getWeather(dataSourse: .cityName(city: cityName)) { currentCityWeather in
+                NetworkManager.getWeather(dataSourse: .cityName(city: cityName)) { currentCityWeather in
                     DispatchQueue.main.async {
                         self.currentCityWeather = currentCityWeather
                         self.showCurrentCityWeather()
@@ -106,7 +106,7 @@ class ViewController: UIViewController {
             }
         case .coordinate:
             if let longitude = longitude, let latitude = latitude {
-                Manager.getWeather(dataSourse: .coordinate(latitude: latitude, longitude: longitude)) { currentCityWeather in
+                NetworkManager.getWeather(dataSourse: .coordinate(latitude: latitude, longitude: longitude)) { currentCityWeather in
                     DispatchQueue.main.async {
                         self.currentCityWeather = currentCityWeather
                         self.showCurrentCityWeather()
@@ -163,7 +163,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: UITableViewDelegate, UITableViewDataSource {
+extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let count = forecastCityWeather?.list.count else {
             return 0
@@ -194,7 +194,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-extension ViewController: CLLocationManagerDelegate {
+extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         latitude = locations.last?.coordinate.latitude
         longitude = locations.last?.coordinate.longitude
@@ -208,7 +208,7 @@ extension ViewController: CLLocationManagerDelegate {
     }
 }
 
-extension ViewController: UITextFieldDelegate {
+extension WeatherViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true

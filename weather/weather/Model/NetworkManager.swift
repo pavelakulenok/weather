@@ -13,17 +13,28 @@ enum DataSource {
     case coordinate(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
 }
 
-enum Manager {
+enum NetworkManager {
     static func getWeather(dataSourse: DataSource, completionCurrentWeather: @escaping (ListWeatherData) -> Void, completionForecastWeather: @escaping (WeatherData) -> Void) {
+        let baseCurrentWeatherURLString = "https://api.openweathermap.org/data/2.5/weather"
+        let baseForecastWeatherURLString = "https://api.openweathermap.org/data/2.5/forecast"
+        guard let path = Bundle.main.path(forResource: "Info", ofType: "plist") else {
+            assertionFailure()
+            return
+        }
+        let keys = NSDictionary(contentsOfFile: path)
+        guard let apiKey = keys?.value(forKey: "API Key") else {
+            assertionFailure()
+            return
+        }
         var urlStringCurrentWeather = ""
         var urlStringForecastWeather = ""
         switch dataSourse {
         case let .cityName(city):
-            urlStringCurrentWeather = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=9276e12f77d3514a750b09c32403379e"
-            urlStringForecastWeather = "https://api.openweathermap.org/data/2.5/forecast?q=\(city)&appid=9276e12f77d3514a750b09c32403379e"
+            urlStringCurrentWeather = "\(baseCurrentWeatherURLString)?q=\(city)&appid=\(apiKey)"
+            urlStringForecastWeather = "\(baseForecastWeatherURLString)?q=\(city)&appid=\(apiKey)"
         case let .coordinate(latitude, longitude):
-            urlStringCurrentWeather = "https://api.openweathermap.org/data/2.5/weather?lat=\(latitude)&lon=\(longitude)&appid=9276e12f77d3514a750b09c32403379e"
-            urlStringForecastWeather = "https://api.openweathermap.org/data/2.5/forecast?lat=\(latitude)&lon=\(longitude)&appid=9276e12f77d3514a750b09c32403379e"
+            urlStringCurrentWeather = "\(baseCurrentWeatherURLString)?lat=\(latitude)&lon=\(longitude)&appid=\(apiKey)"
+            urlStringForecastWeather = "\(baseForecastWeatherURLString)?lat=\(latitude)&lon=\(longitude)&appid=\(apiKey)"
         }
         guard let urlCurrentWeather = URL(string: urlStringCurrentWeather) else {
             return
