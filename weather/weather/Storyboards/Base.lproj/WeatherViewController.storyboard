@@ -8,21 +8,21 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Weather View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="weather" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="WeatherViewController" customModule="weather" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OYd-7T-YSt">
-                                <rect key="frame" x="20" y="64" width="299" height="45"/>
+                                <rect key="frame" x="70" y="64" width="249" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="5Xg-j3-Ufo"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" textContentType="address-level2"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6xt-sf-Frt">
                                 <rect key="frame" x="324" y="64" width="70" height="45"/>
@@ -165,6 +165,16 @@
                                 <rect key="frame" x="20" y="449" width="374" height="413"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TNj-Z4-FeX">
+                                <rect key="frame" x="20" y="64" width="45" height="45"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="45" id="diD-Ra-PY6"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="onLocationButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Xnu-N5-dzd"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -174,13 +184,16 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="6xt-sf-Frt" secondAttribute="trailing" constant="20" id="Lw6-GZ-VFV"/>
                             <constraint firstItem="HOI-JI-IJn" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="O1s-0b-UOV"/>
                             <constraint firstItem="n8h-8f-aW9" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="OZD-cF-U1b"/>
+                            <constraint firstItem="OYd-7T-YSt" firstAttribute="leading" secondItem="TNj-Z4-FeX" secondAttribute="trailing" constant="5" id="R8u-fo-nt6"/>
                             <constraint firstItem="HOI-JI-IJn" firstAttribute="top" secondItem="OYd-7T-YSt" secondAttribute="bottom" constant="10" id="XqU-qe-6J8"/>
-                            <constraint firstItem="OYd-7T-YSt" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="bWr-gY-Dk1"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="HOI-JI-IJn" secondAttribute="trailing" constant="20" id="hRU-aB-8eP"/>
                             <constraint firstItem="6xt-sf-Frt" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="heo-Uy-SWT"/>
+                            <constraint firstItem="TNj-Z4-FeX" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="hsN-VM-W4e"/>
                             <constraint firstItem="6xt-sf-Frt" firstAttribute="leading" secondItem="OYd-7T-YSt" secondAttribute="trailing" constant="5" id="ixX-91-Ch9"/>
                             <constraint firstItem="n8h-8f-aW9" firstAttribute="top" secondItem="HOI-JI-IJn" secondAttribute="bottom" constant="10" id="plg-m8-1sd"/>
+                            <constraint firstItem="TNj-Z4-FeX" firstAttribute="height" secondItem="6xt-sf-Frt" secondAttribute="height" id="uhv-fW-yvt"/>
                             <constraint firstItem="n8h-8f-aW9" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="vam-9o-LXy"/>
+                            <constraint firstItem="TNj-Z4-FeX" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="wfQ-ua-2T1"/>
                             <constraint firstItem="6xt-sf-Frt" firstAttribute="height" secondItem="OYd-7T-YSt" secondAttribute="height" id="xRM-6c-gh5"/>
                         </constraints>
                     </view>
@@ -191,6 +204,7 @@
                         <outlet property="getWeatherButton" destination="6xt-sf-Frt" id="Ybd-bz-4YQ"/>
                         <outlet property="humidityLabel" destination="gZG-J4-pzb" id="WWj-fJ-bd4"/>
                         <outlet property="imageView" destination="hAk-xO-Ita" id="7dY-6S-5c1"/>
+                        <outlet property="locationButton" destination="TNj-Z4-FeX" id="8Vn-IB-rU5"/>
                         <outlet property="maxTemperatureLabel" destination="Zcm-O1-yuw" id="Fh9-Yq-2GP"/>
                         <outlet property="minTemperatureLabel" destination="7Od-Hf-7MW" id="YnY-qf-wp6"/>
                         <outlet property="pressureLabel" destination="fUg-av-ADi" id="sen-FP-Blb"/>
@@ -203,7 +217,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1191.304347826087" y="21.428571428571427"/>
+            <point key="canvasLocation" x="-1675" y="-40"/>
         </scene>
     </scenes>
     <resources>

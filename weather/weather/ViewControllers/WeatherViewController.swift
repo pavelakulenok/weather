@@ -5,17 +5,17 @@
 //  Created by Pavel Akulenak on 24.05.21.
 //
 
+import CoreLocation
 import UIKit
 
-class ViewController: UIViewController {
-    enum TypeOfRequest {
-        case currentWeather(city: String)
-        case forecastWeather(city: String)
-    }
-
+class WeatherViewController: UIViewController {
     private var city: String?
     private var currentCityWeather: ListWeatherData?
     private var forecastCityWeather: WeatherData?
+    private var latitude: CLLocationDegrees?
+    private var longitude: CLLocationDegrees?
+    private var locationManager = CLLocationManager()
+
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var cityNameLabel: UILabel!
@@ -30,19 +30,23 @@ class ViewController: UIViewController {
     @IBOutlet weak var humidityLabel: UILabel!
     @IBOutlet weak var windLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var locationButton: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        if let lastCityNameEntered = UserDefaults.standard.string(forKey: "city") {
-            city = lastCityNameEntered
-        }
         tableView.register(UINib(nibName: "ForecastWeatherTableViewCell", bundle: Bundle.main), forCellReuseIdentifier: "cell")
-        if let cityName = city {
-            getWeather(typeOfRequest: .currentWeather(city: cityName))
-            getWeather(typeOfRequest: .forecastWeather(city: cityName))
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
+        textField.delegate = self
+
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.requestLocation()
+        } else if let lastCityName = UserDefaults.standard.string(forKey: "city") {
+            getWeather(dataSourse: .cityName(city: lastCityName))
         }
     }
 
@@ -51,12 +55,13 @@ class ViewController: UIViewController {
             if !inputText.isEmpty {
                 let cityNameForRequest = inputText.split(separator: " ").joined(separator: "%20")
                 city = cityNameForRequest
+                getWeather(dataSourse: .cityName(city: cityNameForRequest))
             }
         }
-        if let cityName = city {
-            getWeather(typeOfRequest: .currentWeather(city: cityName))
-            getWeather(typeOfRequest: .forecastWeather(city: cityName))
-        }
+    }
+
+    @IBAction private func onLocationButton(_ sender: Any) {
+        locationManager.requestLocation()
     }
 
     private func setupUI() {
@@ -75,47 +80,47 @@ class ViewController: UIViewController {
         humidityLabel.setupLabel(fontName: "HelveticaNeue-Medium", fontSize: 20, fontColor: .lightGray)
         windLabel.setupLabel(fontName: "HelveticaNeue-Medium", fontSize: 20, fontColor: .lightGray)
         tableView.stetupUIView(borderWidth: 2, cornerRadius: 10)
+        locationButton.setImage(UIImage(named: "location"), for: .normal)
+        locationButton.tintColor = .darkGray
+        currentWeatherView.isHidden = true
+        tableView.isHidden = true
     }
 
-    private func getWeather(typeOfRequest: TypeOfRequest) {
-        var urlString = ""
-        switch typeOfRequest {
-        case let .currentWeather(city):
-            urlString = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=9276e12f77d3514a750b09c32403379e"
-        case let .forecastWeather(city):
-            urlString = "https://api.openweathermap.org/data/2.5/forecast?q=\(city)&appid=9276e12f77d3514a750b09c32403379e"
-        }
-
-        guard let url = URL(string: urlString) else {
-            return
-        }
-        let requestWeather = URLRequest(url: url)
-        let dataTaskCurrentWeather = URLSession.shared.dataTask(with: requestWeather) { data, _, _ in
-            guard let data = data else {
-                assertionFailure("Can't get data from \(urlString)")
-                return
-            }
-            do {
-                switch typeOfRequest {
-                case .currentWeather:
-                    self.currentCityWeather = try JSONDecoder().decode(ListWeatherData.self, from: data)
-                    UserDefaults.standard.setValue(self.city, forKey: "city")
+    private func getWeather(dataSourse: DataSource) {
+        switch dataSourse {
+        case .cityName:
+            if let cityName = city {
+                NetworkManager.getWeather(dataSourse: .cityName(city: cityName)) { currentCityWeather in
                     DispatchQueue.main.async {
+                        self.currentCityWeather = currentCityWeather
                         self.showCurrentCityWeather()
+                        self.currentWeatherView.isHidden = false
                     }
-                case .forecastWeather:
-                    self.forecastCityWeather = try JSONDecoder().decode(WeatherData.self, from: data)
+                } completionForecastWeather: { forecastCityWeather in
                     DispatchQueue.main.async {
+                        self.forecastCityWeather = forecastCityWeather
                         self.tableView.reloadData()
+                        self.tableView.isHidden = false
                     }
                 }
-            } catch {
-                DispatchQueue.main.async {
-                    self.showAlertWithOneButton(title: "Can't find this city", message: "please, check the city name", actionTitle: "Ok", actionStyle: .default, handler: nil)
+            }
+        case .coordinate:
+            if let longitude = longitude, let latitude = latitude {
+                NetworkManager.getWeather(dataSourse: .coordinate(latitude: latitude, longitude: longitude)) { currentCityWeather in
+                    DispatchQueue.main.async {
+                        self.currentCityWeather = currentCityWeather
+                        self.showCurrentCityWeather()
+                        self.currentWeatherView.isHidden = false
+                    }
+                } completionForecastWeather: { forecastCityWeather in
+                    DispatchQueue.main.async {
+                        self.forecastCityWeather = forecastCityWeather
+                        self.tableView.reloadData()
+                        self.tableView.isHidden = false
+                    }
                 }
             }
         }
-        dataTaskCurrentWeather.resume()
     }
 
     private func showCurrentCityWeather() {
@@ -124,6 +129,7 @@ class ViewController: UIViewController {
         }
         if let cityName = info.name {
             cityNameLabel.text = cityName
+            UserDefaults.standard.setValue(cityName, forKey: "city")
         }
         if let iconName = info.weather.first?.icon {
             imageView.image = getImage(name: iconName)
@@ -131,7 +137,9 @@ class ViewController: UIViewController {
         temperatureLabel.text = "\((info.main.temperature - 273.15).rounded(toPlaces: 1))℃"
         weatherDiscriptionLabel.text = info.weather.first?.description
         feelsLikeLabel.text = "feels like: \(Int((info.main.feelsLike - 273.15).rounded()))℃"
-        windLabel.text = "wind: \((info.wind.speed).rounded(toPlaces: 1)) m/s, \(getWindDirection(deg: info.wind.deg)), gust: \((info.wind.gust).rounded(toPlaces: 1)) m/s"
+        if let windDirection = info.wind.direction {
+            windLabel.text = "wind: \((info.wind.speed).rounded(toPlaces: 1)) m/s, \(windDirection), gust: \((info.wind.gust).rounded(toPlaces: 1)) m/s"
+        }
         minTemperatureLabel.text = "min: \((info.main.temperatureMin - 273.15).rounded(toPlaces: 1))℃"
         maxTemperatureLabel.text = "max: \((info.main.temperatureMax - 273.15).rounded(toPlaces: 1))℃"
         pressureLabel.text = "pressure: \((info.main.pressure)) hPa"
@@ -153,32 +161,9 @@ class ViewController: UIViewController {
         }
         return image
     }
-
-    private func getWindDirection(deg: Int) -> String {
-        let doubleDeg = Double(deg)
-        var direction = ""
-        if doubleDeg > 337.5 || doubleDeg <= 22.5 {
-            direction = "N"
-        } else if doubleDeg > 22.5 && doubleDeg <= 67.5 {
-            direction = "NE"
-        } else if doubleDeg > 67.5 && doubleDeg <= 112.5 {
-            direction = "E"
-        } else if doubleDeg > 112.5 && doubleDeg <= 157.5 {
-            direction = "SE"
-        } else if doubleDeg > 157.5 && doubleDeg <= 202.5 {
-            direction = "S"
-        } else if doubleDeg > 202.5 && doubleDeg <= 247.5 {
-            direction = "SW"
-        } else if doubleDeg > 247.5 && doubleDeg <= 292.5 {
-            direction = "W"
-        } else if doubleDeg > 292.5 && doubleDeg <= 337.5 {
-            direction = "NW"
-        }
-        return direction
-    }
 }
 
-extension ViewController: UITableViewDelegate, UITableViewDataSource {
+extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let count = forecastCityWeather?.list.count else {
             return 0
@@ -206,5 +191,26 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         }
         cell.stetupUIView(borderWidth: 1, cornerRadius: 0)
         return cell
+    }
+}
+
+extension WeatherViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        latitude = locations.last?.coordinate.latitude
+        longitude = locations.last?.coordinate.longitude
+        if let latitude = latitude, let longitude = longitude {
+            getWeather(dataSourse: .coordinate(latitude: latitude, longitude: longitude))
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        assertionFailure("\(error)")
+    }
+}
+
+extension WeatherViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
