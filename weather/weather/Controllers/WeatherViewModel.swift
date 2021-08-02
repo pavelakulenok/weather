@@ -1,20 +1,25 @@
 //
-//  Manager.swift
+//  WeatherViewModel.swift
 //  weather
 //
-//  Created by Pavel Akulenak on 7.06.21.
+//  Created by Pavel Akulenak on 2.07.21.
 //
 
 import CoreLocation
-import Foundation
+import RxRelay
 
 enum DataSource {
     case cityName(city: String)
     case coordinate(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
 }
 
-enum NetworkManager {
-    static func getWeather(dataSourse: DataSource, completionCurrentWeather: @escaping (ListWeatherData) -> Void, completionForecastWeather: @escaping (WeatherData) -> Void) {
+class WeatherViewModel {
+    var currentWeather = PublishRelay<ListWeatherData>()
+    var forecastWeather = PublishRelay<WeatherData>()
+    var items = PublishRelay<[ListWeatherData]>()
+    var errorAlertMessage = PublishRelay<String>()
+
+    func getWeather(dataSourse: DataSource) {
         let baseCurrentWeatherURLString = "https://api.openweathermap.org/data/2.5/weather"
         let baseForecastWeatherURLString = "https://api.openweathermap.org/data/2.5/forecast"
         guard let path = Bundle.main.path(forResource: "Info", ofType: "plist") else {
@@ -44,16 +49,19 @@ enum NetworkManager {
         }
         let requestCurrentWeather = URLRequest(url: urlCurrentWeather)
         let requestForecastWeather = URLRequest(url: urlForecastWeather)
-        let dataTaskCurrentWeather = URLSession.shared.dataTask(with: requestCurrentWeather) { data, _, _ in
+        let dataTaskCurrentWeather = URLSession.shared.dataTask(with: requestCurrentWeather) { data, _, error in
+            if error != nil {
+                self.errorAlertMessage.accept("network error")
+            }
             guard let data = data else {
                 assertionFailure("Can't get data from \(urlStringCurrentWeather)")
                 return
             }
             do {
-                let currentCityWeather = try JSONDecoder().decode(ListWeatherData.self, from: data)
-                completionCurrentWeather(currentCityWeather)
+                let currentWeather = try JSONDecoder().decode(ListWeatherData.self, from: data)
+                self.currentWeather.accept(currentWeather)
             } catch {
-                assertionFailure("error: can't decode json")
+                self.errorAlertMessage.accept("can't find info for this place")
             }
         }
         dataTaskCurrentWeather.resume()
@@ -63,12 +71,29 @@ enum NetworkManager {
                 return
             }
             do {
-                let forecastCityWeather = try JSONDecoder().decode(WeatherData.self, from: data)
-                completionForecastWeather(forecastCityWeather)
+                let forecastWeather = try JSONDecoder().decode(WeatherData.self, from: data)
+                self.forecastWeather.accept(forecastWeather)
+                self.items.accept(forecastWeather.list)
             } catch {
-                assertionFailure("error: can't decode json")
+                self.errorAlertMessage.accept("can't find info for this place")
             }
         }
         dataTaskForecastWeather.resume()
+    }
+
+    func getImage(name: String) -> UIImage {
+        var image: UIImage?
+        if let url = URL(string: "https://openweathermap.org/img/wn/\(name)@2x.png") {
+            do {
+                let data = try Data(contentsOf: url)
+                image = UIImage(data: data)
+            } catch {
+                assertionFailure("Can't get image from \(url)")
+            }
+        }
+        guard let image = image else {
+            return UIImage()
+        }
+        return image
     }
 }

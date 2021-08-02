@@ -30,9 +30,6 @@
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="5p7-2r-nMI"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
-                                <connections>
-                                    <action selector="onGetWeatherButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dts-yl-1T1"/>
-                                </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HOI-JI-IJn">
                                 <rect key="frame" x="20" y="119" width="374" height="320"/>
@@ -171,9 +168,6 @@
                                     <constraint firstAttribute="width" constant="45" id="diD-Ra-PY6"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
-                                <connections>
-                                    <action selector="onLocationButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Xnu-N5-dzd"/>
-                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
